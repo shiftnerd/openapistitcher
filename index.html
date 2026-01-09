@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OpenAPI Combiner</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo">⛓️</div>
+            <div>
+                <div class="title">OpenAPI Combiner</div>
+                <div class="subtitle">Merge many OpenAPI JSON/YAML files into one</div>
+            </div>
+        </div>
+
+        <div class="top-actions">
+            <button id="btnCombine" class="btn primary">Combine</button>
+            <button id="btnDownload" class="btn" disabled>Download</button>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="panel left">
+            <h2>Inputs</h2>
+
+            <div class="card">
+                <h3>1) Load from GitHub folder</h3>
+                <p class="hint">
+                    Uses GitHub Contents API to list files and download selected specs. Perfect for repos that split OAS
+                    into many files.
+                </p>
+
+                <div class="grid2">
+                    <label>
+                        Owner
+                        <input id="ghOwner" value="zoho" />
+                    </label>
+                    <label>
+                        Repo
+                        <input id="ghRepo" value="zohodesk-oas" />
+                    </label>
+                    <label>
+                        Path
+                        <input id="ghPath" value="v1.0" />
+                    </label>
+                    <label>
+                        Ref (branch/tag/sha)
+                        <input id="ghRef" value="main" />
+                    </label>
+                </div>
+
+                <div class="row">
+                    <button id="btnListGithub" class="btn">List files</button>
+                    <span id="ghStatus" class="status"></span>
+                </div>
+
+                <div class="filelist" id="ghFileList"></div>
+
+                <div class="row">
+                    <button id="btnAddSelectedGithub" class="btn" disabled>Add selected</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>2) Upload local files</h3>
+                <div id="dropzone" class="dropzone">
+                    <div class="dz-title">Drag & drop OpenAPI files here</div>
+                    <div class="dz-sub">or</div>
+                    <label class="btn">
+                        Choose files
+                        <input id="fileInput" type="file" multiple
+                            accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml,text/x-yaml" hidden />
+                    </label>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Selected sources</h3>
+                <div id="selectedList" class="selected"></div>
+                <div class="row">
+                    <button id="btnClear" class="btn danger" disabled>Clear</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Options</h3>
+
+                <label class="rowline">
+                    Output format
+                    <select id="outFormat">
+                        <option value="yaml">YAML</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </label>
+
+                <label class="rowline">
+                    Path conflict
+                    <select id="pathConflict">
+                        <option value="prefer-first">Prefer first (keep existing)</option>
+                        <option value="prefer-last">Prefer last (overwrite)</option>
+                    </select>
+                </label>
+
+                <label class="rowline">
+                    Component conflict
+                    <select id="componentConflict">
+                        <option value="rename">Auto-rename incoming conflicts</option>
+                        <option value="overwrite">Overwrite existing</option>
+                        <option value="keep">Keep existing (skip incoming)</option>
+                    </select>
+                </label>
+
+                <label class="rowline">
+                    Component prefix mode
+                    <select id="prefixMode">
+                        <option value="filename">Use filename (recommended)</option>
+                        <option value="index">Use numeric index</option>
+                    </select>
+                </label>
+
+                <label class="rowline">
+                    Base title (optional)
+                    <input id="baseTitle" placeholder="e.g., Zoho Desk API (Combined)" />
+                </label>
+
+                <label class="rowline">
+                    Base version (optional)
+                    <input id="baseVersion" placeholder="e.g., 1.0.0" />
+                </label>
+            </div>
+        </section>
+
+        <section class="panel right">
+            <h2>Output</h2>
+
+            <div class="card">
+                <h3>Summary</h3>
+                <div id="summary" class="summary muted">
+                    Add some sources, then click <b>Combine</b>.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Combined spec</h3>
+                <textarea id="output" spellcheck="false" placeholder="Combined OpenAPI spec will appear here..."
+                    readonly></textarea>
+            </div>
+
+            <div class="card">
+                <h3>Log</h3>
+                <pre id="log" class="log"></pre>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <span>Tip: For Zoho’s split specs, click “List files”, select what you want, then “Add selected”.</span>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
